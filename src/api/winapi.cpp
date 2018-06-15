@@ -65,6 +65,7 @@ BOOL GetProcessModule(DWORD dwPID, LPCTSTR pszProcessName)
 	{
 		do
 		{
+			printf("%s\n", me32.szModule);
 			if(strcmp(me32.szModule, pszProcessName) == 0)
 			{
 				CloseHandle (hModuleSnap);
@@ -112,12 +113,83 @@ DWORD GetProcessID(LPCTSTR pszProcessName)
 	return dwProcessID;
 }
 
+#include <psapi.h>
+
+DWORD getProcessID(std::string pszProcessName)
+{
+	// get the list of process identifiers
+	DWORD aProcesses[1024], cbNeeded, cProcesses;
+	if (!EnumProcesses(aProcesses, sizeof(aProcesses), &cbNeeded))
+	{
+		return 0;
+	}
+
+	cProcesses = cbNeeded / sizeof(DWORD);
+
+	bool bFound = false;
+	DWORD processID = 0;
+	for (size_t i = 0; i < cProcesses; i++)
+	{
+		processID = aProcesses[i];
+		if (processID == 0)
+		{
+			continue;
+		}
+
+		TCHAR szProcessName[MAX_PATH] = TEXT("<unknown>");
+
+		// Get a handle to the process.
+		HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION |
+			PROCESS_VM_READ,
+			FALSE, processID);
+
+		// Get the process name.
+		if (NULL != hProcess)
+		{
+			HMODULE hMod;
+			DWORD cbNeeded;
+
+			if (EnumProcessModules(hProcess, &hMod, sizeof(hMod),
+				&cbNeeded))
+			{
+				GetModuleBaseName(hProcess, hMod, szProcessName,
+					sizeof(szProcessName) / sizeof(TCHAR));
+			}
+		}
+
+		// Print the process name and identifier.
+		//printf(TEXT("%s  (PID: %u)\n"), szProcessName, processID);
+
+		char buf[MAX_PATH] = { 0 };
+		strcpy_s(buf, MAX_PATH, szProcessName);
+
+		if (buf == pszProcessName)
+		{
+			bFound = true;
+		}
+
+		// Release the handle to the process.
+		CloseHandle(hProcess);
+
+		if (bFound) {
+			break;
+		}
+	}
+
+	if (!bFound) {
+		return 0;
+	}
+
+	return processID;
+}
 
 void readFromHWND(cv::Mat& img, const char *target)
 {
-	const char *name = "chrome.exe";
+	std::string name = "MEmu.exe";
+	DWORD pid = getProcessID(name);
 
-	HWND hwnd = GetWindowFromPID( GetProcessID( name ) );
+	HWND hwnd = GetWindowFromPID(pid);
+
 	if (hwnd == NULL)
 	{
 		return;
@@ -130,7 +202,7 @@ void readFromHWND(cv::Mat& img, const char *target)
 		return;
 		//return NULL;
 	}
-
+	
 	HDC scDC = ::GetDC(GetDesktopWindow());
 	HDC memDC = ::CreateCompatibleDC(scDC);
 
