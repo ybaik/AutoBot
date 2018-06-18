@@ -7,7 +7,7 @@ using namespace std;
 
 void readFromHWND(cv::Mat& img, const char *target)
 {
-	LPCTSTR windowName = "MEmu";
+	LPCTSTR windowName = "KOPLAYER 1.4.1055";
 	HWND hwnd = FindWindow(NULL, windowName);
 
 	if (hwnd == NULL)
@@ -38,13 +38,24 @@ void readFromHWND(cv::Mat& img, const char *target)
 	int bmp_padding = (width * 3) % 4;
 	if (bmp_padding != 0) bmp_padding = 4 - bmp_padding;
 
+	BYTE *bmp_pixels = new BYTE[(width * 3 + bmp_padding) * height];;
+	GetDIBits(hMemDC, hbmp, 0, height, bmp_pixels, &bmp_info, DIB_RGB_COLORS);
+
+	// copy to cv::Mat
 	img = cv::Mat(height, width, CV_8UC3, cv::Scalar(0));
-	//BYTE *bmp_pixels = new BYTE[(width * 3 + bmp_padding) * height];;
-	GetDIBits(hMemDC, hbmp, 0, height, img.data, &bmp_info, DIB_RGB_COLORS);
-	//memcpy(img.data, bmp_pixels, width * height * 3);
+	BYTE* src = bmp_pixels;
+	BYTE* dst = img.data;
+
+	for (int i = 0; i < height; i++)
+	{
+		memcpy(dst, src, img.step);
+		src += img.step + bmp_padding;
+		dst += img.step;
+	}
 
 	cv::flip(img, img, 0);
 	
+	delete[] bmp_pixels;
 	DeleteDC(hMemDC);
 	DeleteObject(hbmp);
 }
