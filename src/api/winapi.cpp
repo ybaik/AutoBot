@@ -1,251 +1,53 @@
 ﻿#include "winapi.h"
 
 #include <string>
-#include <errno.h>
-
-//#include <opencv/cv.h>
-//#include <opencv/highgui.h>
-
 #include <windows.h>
-#include <process.h>
-#include <Tlhelp32.h>
-#include <stdio.h>
-#include <conio.h>
 
 using namespace std;
 
-struct CallbackInfo
-{
-	DWORD m_dwPID;
-	HWND m_hWnd;
-};
-
-BOOL CALLBACK EnumProc(HWND hWnd, LPARAM lParam)
-{
-	DWORD dwPID = 0;
-	CallbackInfo *pst_Callback = (CallbackInfo *)lParam;
-
-	GetWindowThreadProcessId(hWnd, &dwPID);
-
-	if (pst_Callback->m_dwPID != dwPID)
-		return TRUE;
-
-	pst_Callback->m_hWnd = hWnd;
-	return FALSE;
-}
-
-HWND GetWindowFromPID(DWORD dwPID)
-{
-	CallbackInfo st_Callback;
-
-	if (dwPID == 0)
-		return NULL;
-
-	st_Callback.m_dwPID = dwPID;
-	st_Callback.m_hWnd = NULL;
-
-	EnumWindows(EnumProc, (LPARAM)&st_Callback);
-
-	return st_Callback.m_hWnd;
-}
-
-BOOL GetProcessModule(DWORD dwPID, LPCTSTR pszProcessName)
-{
-	HANDLE        hModuleSnap = NULL;
-	MODULEENTRY32 me32        = {0};
-
-	hModuleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, dwPID);
-
-	if (hModuleSnap == (HANDLE)-1)
-		return FALSE;
-
-	me32.dwSize = sizeof(MODULEENTRY32);
-
-	if(Module32First(hModuleSnap, &me32))
-	{
-		do
-		{
-			printf("%s\n", me32.szModule);
-			if(strcmp(me32.szModule, pszProcessName) == 0)
-			{
-				CloseHandle (hModuleSnap);
-				return TRUE;
-			}
-		}while(Module32Next(hModuleSnap, &me32));
-	}
-
-	CloseHandle (hModuleSnap);
-
-	return FALSE;
-}
-
-DWORD GetProcessID(LPCTSTR pszProcessName)
-{
-
-	HANDLE         hProcessSnap = NULL;
-	BOOL           bRet      = FALSE;
-	PROCESSENTRY32 pe32      = {0};
-
-	hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-	if (hProcessSnap == (HANDLE)-1)
-		return false;
-
-	pe32.dwSize = sizeof(PROCESSENTRY32);
-	DWORD dwProcessID = 0;
-
-	if (Process32First(hProcessSnap, &pe32))
-	{
-		BOOL          bCurrent = FALSE;
-		MODULEENTRY32 me32       = {0};
-		do
-		{
-			bCurrent = GetProcessModule(pe32.th32ProcessID, pszProcessName);
-			if(bCurrent)
-			{
-				dwProcessID = pe32.th32ProcessID;
-				break;
-			}
-
-		} while (Process32Next(hProcessSnap, &pe32));
-	}
-
-	CloseHandle (hProcessSnap);
-	return dwProcessID;
-}
-
-#include <psapi.h>
-
-DWORD getProcessID(std::string pszProcessName)
-{
-	// get the list of process identifiers
-	DWORD aProcesses[1024], cbNeeded, cProcesses;
-	if (!EnumProcesses(aProcesses, sizeof(aProcesses), &cbNeeded))
-	{
-		return 0;
-	}
-
-	cProcesses = cbNeeded / sizeof(DWORD);
-
-	bool bFound = false;
-	DWORD processID = 0;
-	for (size_t i = 0; i < cProcesses; i++)
-	{
-		processID = aProcesses[i];
-		if (processID == 0)
-		{
-			continue;
-		}
-
-		TCHAR szProcessName[MAX_PATH] = TEXT("<unknown>");
-
-		// Get a handle to the process.
-		HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION |
-			PROCESS_VM_READ,
-			FALSE, processID);
-
-		// Get the process name.
-		if (NULL != hProcess)
-		{
-			HMODULE hMod;
-			DWORD cbNeeded;
-
-			if (EnumProcessModules(hProcess, &hMod, sizeof(hMod),
-				&cbNeeded))
-			{
-				GetModuleBaseName(hProcess, hMod, szProcessName,
-					sizeof(szProcessName) / sizeof(TCHAR));
-			}
-		}
-
-		// Print the process name and identifier.
-		//printf(TEXT("%s  (PID: %u)\n"), szProcessName, processID);
-
-		char buf[MAX_PATH] = { 0 };
-		strcpy_s(buf, MAX_PATH, szProcessName);
-
-		if (buf == pszProcessName)
-		{
-			bFound = true;
-		}
-
-		// Release the handle to the process.
-		CloseHandle(hProcess);
-
-		if (bFound) {
-			break;
-		}
-	}
-
-	if (!bFound) {
-		return 0;
-	}
-
-	return processID;
-}
-
 void readFromHWND(cv::Mat& img, const char *target)
 {
-	std::string name = "MEmu.exe";
-	DWORD pid = getProcessID(name);
-
-	HWND hwnd = GetWindowFromPID(pid);
+	LPCTSTR windowName = "MEmu";
+	HWND hwnd = FindWindow(NULL, windowName);
 
 	if (hwnd == NULL)
 	{
+		printf("Can't find window\n");
 		return;
-		//return NULL;
 	}
-
-	HWND handle = FindWindowEx( hwnd, NULL, NULL, NULL);
-	if (handle == NULL)
-	{
-		return;
-		//return NULL;
-	}
-	
-	HDC scDC = ::GetDC(GetDesktopWindow());
-	HDC memDC = ::CreateCompatibleDC(scDC);
 
 	RECT rc;
-	GetWindowRect(handle, &rc);    
-
+	GetWindowRect(hwnd, &rc);
 	int width = rc.right - rc.left;
 	int height = rc.bottom - rc.top;
 
-	BITMAPINFO dib_define;
-	dib_define.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-	dib_define.bmiHeader.biWidth = width;
-	dib_define.bmiHeader.biHeight = height;
-	dib_define.bmiHeader.biPlanes = 1;
-	dib_define.bmiHeader.biBitCount = 24;
-	dib_define.bmiHeader.biCompression = BI_RGB;
-	dib_define.bmiHeader.biSizeImage = (((width * 24 + 31) & ~31) >> 3) * height;
-	dib_define.bmiHeader.biXPelsPerMeter = 0;
-	dib_define.bmiHeader.biYPelsPerMeter = 0;
-	dib_define.bmiHeader.biClrImportant = 0;
-	dib_define.bmiHeader.biClrUsed = 0;
+	HDC hScreenDC = GetWindowDC(hwnd);
+	HDC hMemDC = CreateCompatibleDC(hScreenDC);
+	HBITMAP hbmp = CreateCompatibleBitmap(hScreenDC, width, height);
+	SelectObject(hMemDC, hbmp);
+	BitBlt(hMemDC, 0, 0, width, height, hScreenDC, 0, 0, SRCCOPY);
 
-	BYTE *p_image_data = NULL;
+	BITMAPINFO bmp_info = { 0 };
+	bmp_info.bmiHeader.biSize = sizeof(bmp_info.bmiHeader);
+	bmp_info.bmiHeader.biWidth = width;
+	bmp_info.bmiHeader.biHeight = height;
+	bmp_info.bmiHeader.biPlanes = 1;
+	bmp_info.bmiHeader.biBitCount = 24;
+	bmp_info.bmiHeader.biCompression = BI_RGB;
 
-	HBITMAP h_bitmap = ::CreateDIBSection(scDC, &dib_define, DIB_RGB_COLORS, (void **)&p_image_data, 0, 0);
-	HBITMAP h_old_bitmap = (HBITMAP)::SelectObject(memDC, h_bitmap);
+	int bmp_padding = (width * 3) % 4;
+	if (bmp_padding != 0) bmp_padding = 4 - bmp_padding;
 
-	BitBlt(memDC, 0, 0, width, height, scDC, rc.left, rc.top, SRCCOPY);
-	SelectObject(memDC, h_old_bitmap);
+	img = cv::Mat(height, width, CV_8UC3, cv::Scalar(0));
+	//BYTE *bmp_pixels = new BYTE[(width * 3 + bmp_padding) * height];;
+	GetDIBits(hMemDC, hbmp, 0, height, img.data, &bmp_info, DIB_RGB_COLORS);
+	//memcpy(img.data, bmp_pixels, width * height * 3);
 
-	DeleteDC(memDC);
-
-	BITMAPFILEHEADER dib_format_layout;
-	ZeroMemory(&dib_format_layout, sizeof(BITMAPFILEHEADER));
-	dib_format_layout.bfType = *(WORD*)"BM";
-	dib_format_layout.bfSize = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + dib_define.bmiHeader.biSizeImage;
-	dib_format_layout.bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
-
-	img = cv::Mat(cv::Size(width, height), IPL_DEPTH_8U, 3);
-	memcpy(img.data, p_image_data, width * height);
 	cv::flip(img, img, 0);
+	
+	DeleteDC(hMemDC);
+	DeleteObject(hbmp);
 }
-
 
 void readFromAdb(cv::Mat& img, const char *adb)
 {
