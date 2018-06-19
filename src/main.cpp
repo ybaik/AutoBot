@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <conio.h>
-#include "system.hpp"
+#include "system.h"
 
 #ifdef _DEBUG
 #pragma comment(lib, "opencv_core2413d.lib")
@@ -14,7 +14,7 @@
 
 void main()
 {
-	System sys;
+	System sys("config.xml");
 
 	while (1)
 	{

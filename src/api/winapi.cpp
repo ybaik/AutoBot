@@ -7,7 +7,7 @@ using namespace std;
 
 void readFromHWND(cv::Mat& img, const char *target)
 {
-	LPCTSTR windowName = "KOPLAYER 1.4.1055";
+	LPCTSTR windowName = target;
 	HWND hwnd = FindWindow(NULL, windowName);
 
 	if (hwnd == NULL)
@@ -102,19 +102,17 @@ void readFromAdb(cv::Mat& img, const char *adb)
 	img = cv::imread("tmp.png", -1);
 }
 
-
 void winapi::grab(cv::Mat& img)
 {
-	switch( _grabber ) {
+	switch( _grab_method ) {
 	case api::WindowHandle:
-		readFromHWND(img, adb().c_str());
+		readFromHWND(img, _appName.c_str());
 		break;
 	case api::Adb:
 		readFromAdb(img, adb().c_str());
 		break;
 	}
 };
-
 
 std::string winapi::adb(bool flag)
 {

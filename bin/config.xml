@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Config>
+	<AppPlayer
+		name="NoxPlayer"
+		version="6.1.1.0"
+		window_title="NoxPlayer"
+	/>
+	<API
+		grab_method="win_handle"
+		input_method="adb"
+	/>
+</Config>

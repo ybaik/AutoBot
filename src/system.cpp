@@ -1,8 +1,28 @@
-#include "system.hpp"
+#include "system.h"
 
-System::System()
+System::System(const std::string& config_path)
 {
+	_config.loadConfig(config_path);
 	_api = new winapi;
+
+	// set grab method
+	if (_config.grabMethod == "adb") {
+		_api->setGrabMethod(api::Method::Adb);
+	}
+	else if (_config.grabMethod == "win_handle") {
+		_api->setGrabMethod(api::Method::WindowHandle);
+	}
+
+	// set input method
+	if (_config.inputMethod == "adb") {
+		_api->setInputMethod(api::Method::Adb);
+	}
+	else if (_config.inputMethod == "win_handle") {
+		_api->setInputMethod(api::Method::WindowHandle);
+	}
+
+	// set app name
+	_api->setAppName(_config.appInfo.window_title);
 }
 
 System::~System()

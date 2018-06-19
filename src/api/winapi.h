@@ -1,7 +1,7 @@
 #ifndef __WIN_API_H__
 #define __WIN_API_H__
 
-#include "api.hpp"
+#include "api.h"
 
 class winapi : public api
 {

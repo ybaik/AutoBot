@@ -1,4 +1,4 @@
-#include "api.hpp"
+#include "api.h"
 
 #ifdef _WIN32
 #define POPEN(x, y)	_popen(x, y)
@@ -13,14 +13,24 @@ api::api()
 
 }
 
-api::Grabber api::getGrabber()
+api::Method api::getGrabMethod()
 {
-	return _grabber;
+	return _grab_method;
 }
 
-void api::setGrabber(Grabber grabber)
+void api::setGrabMethod(Method grabber)
 {
-	_grabber = grabber;
+	_grab_method = grabber;
+}
+
+void api::setInputMethod(Method input)
+{
+	_input_method = input;
+}
+
+void api::setAppName(const std::string& app_name)
+{
+	_appName = app_name;
 }
 
 std::vector<std::string> api::getDevices()

@@ -9,7 +9,7 @@
 class api
 {
 public:
-	enum Grabber {
+	enum Method {
 		WindowHandle,
 		Adb
 	};
@@ -18,8 +18,10 @@ public:
 	api();
 	virtual ~api() {};
 
-	Grabber getGrabber();
-	void setGrabber(Grabber grab);
+	Method getGrabMethod();
+	void setGrabMethod(Method grab);
+	void setInputMethod(Method input);
+	void setAppName(const std::string& app_name);
 
 	std::vector<std::string> getDevices();
 	void setDevice(std::string deviceID);
@@ -32,7 +34,11 @@ protected:
 
 
 protected:
-	Grabber _grabber = Grabber::WindowHandle;
+	Method _grab_method;
+	Method _input_method;
+
+	std::string _appName; // for WindowHandle
+
 	std::string _target = "";
 
 };
