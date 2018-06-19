@@ -63,8 +63,7 @@ void readFromHWND(cv::Mat& img, const char *target)
 void readFromAdb(cv::Mat& img, const char *adb)
 {
 	string command = adb;
-	command += "shell screencap -p > screen.png";
-
+	command += " shell screencap -p > screen.png";
 	system(command.c_str());
 
 	FILE *fp = fopen("screen.png", "rb");

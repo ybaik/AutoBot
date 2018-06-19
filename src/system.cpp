@@ -5,8 +5,11 @@ System::System(const std::string& config_path)
 	_config.loadConfig(config_path);
 	_api = new winapi;
 
+	bool bUseAdb = false;
+
 	// set grab method
 	if (_config.grabMethod == "adb") {
+		bUseAdb = true;
 		_api->setGrabMethod(api::Method::Adb);
 	}
 	else if (_config.grabMethod == "win_handle") {
@@ -15,6 +18,7 @@ System::System(const std::string& config_path)
 
 	// set input method
 	if (_config.inputMethod == "adb") {
+		bUseAdb = true;
 		_api->setInputMethod(api::Method::Adb);
 	}
 	else if (_config.inputMethod == "win_handle") {
@@ -23,6 +27,21 @@ System::System(const std::string& config_path)
 
 	// set app name
 	_api->setAppName(_config.appInfo.window_title);
+
+	if (bUseAdb)
+	{
+		if (_config.appInfo.name == "NoxPlayer")
+		{
+			system("adb connect 127.0.0.1:62001");
+		}
+
+		std::vector<std::string> targets = _api->getDevices();
+		
+		if (targets.size())
+		{
+			_api->setDevice(targets[0]);
+		}
+	}
 }
 
 System::~System()
