@@ -5,9 +5,10 @@
 
 using namespace std;
 
-void readFromHWND(cv::Mat& img, const char *target)
+void readFromHWND(cv::Mat& img, const std::string& target)
 {
-	LPCTSTR windowName = target;
+	std::wstring wtarget(target.begin(), target.end());
+	LPCTSTR windowName = wtarget.c_str();
 	HWND hwnd = FindWindow(NULL, windowName);
 
 	if (hwnd == NULL)
@@ -105,7 +106,7 @@ void winapi::grab(cv::Mat& img)
 {
 	switch( _grab_method ) {
 	case api::WindowHandle:
-		readFromHWND(img, _appName.c_str());
+		readFromHWND(img, _appName);
 		break;
 	case api::Adb:
 		readFromAdb(img, adb().c_str());

@@ -5,39 +5,50 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Form Files">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
     </Filter>
     <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
     </Filter>
-    <Filter Include="Source Files\api">
-      <UniqueIdentifier>{4a52ba3f-8f38-47dc-9c6a-81d298c38e41}</UniqueIdentifier>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>moc;h;cpp</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
     </Filter>
-    <Filter Include="Source Files\config">
-      <UniqueIdentifier>{7528f3d6-7181-4be8-ad52-5f8edf50e078}</UniqueIdentifier>
+    <Filter Include="Source Files\UI">
+      <UniqueIdentifier>{eabdf6d7-1f48-4cb1-9ef7-611b209761ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\control">
+      <UniqueIdentifier>{72f74cc4-5abb-4976-ac75-e82a66580913}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\tinyxml">
-      <UniqueIdentifier>{287cbf72-3c19-4e43-be20-a5ee86cf4df1}</UniqueIdentifier>
+      <UniqueIdentifier>{0a448f61-f0c7-44e7-a62c-db6667e299fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\api">
+      <UniqueIdentifier>{a6f17cb3-5fd0-42da-b1dc-354e8297793d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\config">
+      <UniqueIdentifier>{849cd045-82c9-4990-a1bd-ecd6d8df5f97}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\UI\MainWindow.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\system.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\api\api.cpp">
-      <Filter>Source Files\api</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\api\winapi.cpp">
-      <Filter>Source Files\api</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\config\config.cpp">
-      <Filter>Source Files\config</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\tinyxml\tinystr.cpp">
       <Filter>Source Files\tinyxml</Filter>
@@ -51,25 +62,47 @@
     <ClCompile Include="..\..\src\tinyxml\tinyxmlparser.cpp">
       <Filter>Source Files\tinyxml</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\config\config.cpp">
+      <Filter>Source Files\config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\api\api.cpp">
+      <Filter>Source Files\api</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\api\winapi.cpp">
+      <Filter>Source Files\api</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\api\winapi.h">
-      <Filter>Source Files\api</Filter>
+    <QtMoc Include="..\..\src\UI\MainWindow.h">
+      <Filter>Source Files\UI</Filter>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="..\..\src\UI\MainWindow.ui">
+      <Filter>Source Files\UI</Filter>
+    </QtUic>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="GeneratedFiles\ui_MainWindow.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\system.h">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\api\api.h">
-      <Filter>Source Files\api</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\config\config.h">
-      <Filter>Source Files\config</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\tinyxml\tinystr.h">
       <Filter>Source Files\tinyxml</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\tinyxml\tinyxml.h">
       <Filter>Source Files\tinyxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\config\config.h">
+      <Filter>Source Files\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\api\api.h">
+      <Filter>Source Files\api</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\api\winapi.h">
+      <Filter>Source Files\api</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

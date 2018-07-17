@@ -60,14 +60,24 @@ System::~System()
 
 void System::start()
 {
+	if (!_continue)
+	{
+		if (_thread.joinable()) {
+			_thread.join();
+		}
+
 	_continue = true;
 	_thread = std::thread(&System::loop, this);
+}
 }
 
 void System::stop()
 {
+	if (_continue)
+	{
 	_continue = false;
 	_thread.join();
+}
 }
 
 void System::loop()
@@ -79,15 +89,16 @@ void System::loop()
 		cv::Mat img;
 		_api->grab(img);
 
-		cv::imshow("test", img);
-		cv::waitKey(0);
+		if (img.cols == 0 || img.rows == 0)
+		{
+			_continue = false;
+			continue;
+		}
 
+		//cv::imshow("test", img);
+		//cv::waitKey(1);
 		//run_bot(img);
 		//cvReleaseImage(&img);
-
-
-
-
 	}
 }
 
